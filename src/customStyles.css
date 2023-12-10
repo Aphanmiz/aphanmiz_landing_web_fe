@@ -1,0 +1,5 @@
+.ant-layout-content.full-height-no-padding {
+  height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
