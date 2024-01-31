@@ -1,55 +1,15 @@
-// import React, { useState } from "react";
-// import { Layout } from "antd";
-// import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-// import AuthContext from "./AuthContext";
-// import HeaderComponent from "./components/HeaderComponent";
-// import DashboardNavigation from "./components/DashboardNavigation"; // import your DashboardNavigation
-// import FooterComponent from "./components/FooterComponent";
-// import MapComponent from "./components/MapComponent"; // import your MapComponent
-// import TrendComponent from "./components/TrendComponent"; // import your PortfolioComponent
+import React, { useState, useCallback } from "react";
+import { Layout, ConfigProvider } from "antd";
 
-// import "./customStyles.css";
-
-// const { Content } = Layout;
-
-// const App = () => {
-//   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-//   return (
-//     <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
-//       <Router>
-//         <Layout>
-//           <HeaderComponent />
-//           <Layout>
-//             <DashboardNavigation />
-//             <Content style={{ padding: "0 24px", minHeight: 280 }}>
-//               <Routes>
-//                 <Route
-//                   path="/location-intelligence"
-//                   element={<MapComponent />}
-//                 />
-//                 <Route path="/trend-analysis" element={<TrendComponent />} />
-//               </Routes>
-//               <FooterComponent />
-//             </Content>
-//           </Layout>
-//         </Layout>
-//       </Router>
-//     </AuthContext.Provider>
-//   );
-// };
-
-// export default App;
-
-import React, { useState } from "react";
-import { Layout } from "antd";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
-import AuthContext from "./AuthContext";
+import UserContext from "./contexts/UserContext";
+import AuthContext from "./contexts/AuthContext";
+
 import HeaderComponent from "./components/HeaderComponent";
 import DashboardNavigation from "./components/DashboardNavigation";
 import FooterComponent from "./components/FooterComponent";
@@ -57,71 +17,74 @@ import MapComponent from "./components/MapComponent";
 import TrendComponent from "./components/TrendComponent";
 import UserAuthComponent from "./components/UserAuthComponent"; // import your combined SignIn/SignUp component
 
-import "./customStyles.css";
+const theme = {
+  // The variable to override
+  token: {
+    colorPrimary: "#002F56",
+  },
+};
 
 const { Content } = Layout;
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const onLogin = useCallback(() => setIsAuthenticated(true), []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
-      <Router>
-        <Layout>
-          {isAuthenticated ? (
+    <ConfigProvider theme={theme}>
+      <UserContext.Provider value={{ user, setUser }}>
+        <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+          <Router>
             <Layout>
-              <HeaderComponent />
+              {isAuthenticated ? (
+                <Layout>
+                  <HeaderComponent />
 
-              <Layout>
-                <DashboardNavigation />
+                  <Layout>
+                    <DashboardNavigation />
 
-                <Content>
+                    <Content>
+                      <Routes>
+                        <Route
+                          path="/location-intelligence/:year"
+                          element={<MapComponent />}
+                        />
+                        <Route
+                          path="/trend-analysis"
+                          element={<TrendComponent />}
+                        />
+                        <Route
+                          index
+                          element={
+                            <Navigate
+                              to="location-intelligence/:year"
+                              replace
+                            />
+                          }
+                        />
+                      </Routes>
+                      <FooterComponent />
+                    </Content>
+                  </Layout>
+                </Layout>
+              ) : (
+                <Layout>
                   <Routes>
                     <Route
                       path="/auth"
-                      element={
-                        <UserAuthComponent
-                          onLogin={() => setIsAuthenticated(true)}
-                        />
-                      }
+                      element={<UserAuthComponent onLogin={onLogin} />}
                     />
-                    <Route
-                      path="/location-intelligence"
-                      element={<MapComponent />}
-                    />
-                    <Route
-                      path="/trend-analysis"
-                      element={<TrendComponent />}
-                    />
-                    <Route
-                      index
-                      element={<Navigate to="/location-intelligence" />}
-                    />
-                    {/* ... other routes */}
+                    <Route path="*" element={<Navigate replace to="/auth" />} />
                   </Routes>
                   <FooterComponent />
-                </Content>
-              </Layout>
+                </Layout>
+              )}
             </Layout>
-          ) : (
-            <Layout>
-              <Routes>
-                <Route
-                  path="/auth"
-                  element={
-                    <UserAuthComponent
-                      onLogin={() => setIsAuthenticated(true)}
-                    />
-                  }
-                />
-                <Route path="*" element={<Navigate replace to="/auth" />} />
-              </Routes>
-              <FooterComponent />
-            </Layout>
-          )}
-        </Layout>
-      </Router>
-    </AuthContext.Provider>
+          </Router>
+        </AuthContext.Provider>
+      </UserContext.Provider>
+    </ConfigProvider>
   );
 };
 

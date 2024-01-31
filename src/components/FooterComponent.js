@@ -7,6 +7,7 @@ const FooterComponent = () => (
   <Footer
     style={{
       textAlign: "center",
+      backgroundColor: "transparent",
     }}
   >
     Aphanmiz Landing ©2023

@@ -1,9 +1,8 @@
 import React from "react";
-import { Layout, Input } from "antd";
+import { Layout } from "antd";
 import AccountDropdown from "./AccountDropdown";
 
 const { Header } = Layout;
-const { Search } = Input;
 const logo = "/images/aphanmiz_logo_blue.png";
 
 const HeaderComponent = () => (
@@ -22,11 +21,6 @@ const HeaderComponent = () => (
   >
     <div style={{ display: "flex", alignItems: "center" }}>
       <img src={logo} alt="Company Logo" style={{ height: "45px" }} />
-      <Search
-        placeholder="Search insights ..."
-        onSearch={(value) => console.log(value)}
-        style={{ marginLeft: "20px", width: "400px" }}
-      />
     </div>
     <AccountDropdown />
   </Header>

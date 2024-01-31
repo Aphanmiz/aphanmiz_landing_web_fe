@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   SettingOutlined,
   LogoutOutlined,
@@ -7,9 +9,21 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Avatar, Space } from "antd";
+import UserContext from "../contexts/UserContext";
+import { logoutUser } from "../utils";
 
 const AccountDropdown = () => {
-  const username = "Carlos Estrada"; // Replace with dynamic username
+  const navigate = useNavigate();
+
+  // useContext(UserContext) has a value of { user, setUser }
+  const user = useContext(UserContext).user;
+  console.log("user: ", user);
+  const username = user ? `${user.first_name} ${user.last_name}` : "Guest";
+
+  const handleLogout = async () => {
+    await logoutUser();
+    navigate("/auth"); // Navigate to the authentication page
+  };
 
   // Custom menu items
   const customMenuItems = [
@@ -27,6 +41,7 @@ const AccountDropdown = () => {
       label: "Logout",
       key: "3",
       icon: <LogoutOutlined />,
+      onClick: handleLogout,
     },
     // Add other items as needed
   ];
